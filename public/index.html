@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-TW" data-theme="pure">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8fafc">
+  <meta name="description" content="Gauge.js — subscription quota dashboard">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/png" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/styles.css">
+  <title>Gauge.js</title>
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Gauge.js"><img src="/icons/icon-192.png" width="38" height="38" alt=""><span>Gauge<span class="brand-dot">.js</span></span></a>
+    <div class="preferences">
+      <label><span data-i18n="language">語言</span><select id="locale" aria-label="語言"><option value="zh-TW">繁體中文</option><option value="en">English</option><option value="ja">日本語</option></select></label>
+      <label><span data-i18n="theme">主題</span><select id="theme" aria-label="主題"></select></label>
+      <button id="lock" class="quiet" hidden data-i18n="lock">鎖定</button>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <div><p class="eyebrow" data-i18n="eyebrow">訂閱額度儀表板</p><h1 data-i18n="dashboard">掌握每一份額度。</h1><p class="subtitle" data-i18n="subtitle">集中查看剩餘額度，讓通知提醒您何時回來。</p></div>
+      <button id="add-account" class="primary" data-i18n="addAccount">新增帳號</button>
+    </section>
+    <div id="connection" class="connection" role="status" aria-live="polite" data-i18n="loading">正在連線至伺服器…</div>
+    <section id="summary" class="summary" aria-label="摘要"></section>
+    <nav class="tabs" aria-label="導覽"><button data-tab="accounts" class="active" data-i18n="accounts">帳號</button><button data-tab="events" data-i18n="events">通知紀錄</button><button data-tab="settings" data-i18n="settings">設定</button></nav>
+    <section id="accounts-panel"><div class="section-heading"><h2 data-i18n="yourAccounts">您的帳號</h2><button id="refresh" class="quiet" data-i18n="refresh">重新整理</button></div><div id="accounts" class="accounts"></div></section>
+    <section id="events-panel" hidden><div class="section-heading"><h2 data-i18n="events">通知紀錄</h2><button id="refresh-events" class="quiet" data-i18n="refresh">重新整理</button></div><div id="events"></div></section>
+    <section id="settings-panel" hidden>
+      <div class="section-heading"><h2 data-i18n="settings">設定</h2></div>
+      <p id="default-interval-warning" class="hint" hidden data-i18n="fastWarning">不到一分鐘的間隔會增加 API 呼叫與限流風險。</p>
+      <div class="settings-grid">
+        <form id="settings-form" class="panel"><h3 data-i18n="monitoring">監測預設值</h3><label><span data-i18n="defaultInterval">預設監測間隔</span><select name="defaultInterval"></select></label><p class="hint" data-i18n="defaultIntervalHelp">套用至新帳號，不會變更現有帳號。</p><label><span data-i18n="defaultLocale">預設語言</span><select name="defaultLocale"><option value="zh-TW">繁體中文</option><option value="en">English</option><option value="ja">日本語</option></select></label><label><span data-i18n="defaultTheme">預設主題</span><select name="defaultTheme"></select></label><label><span data-i18n="cooldown">通知冷卻時間（小時）</span><input name="cooldownHours" type="number" min="0" max="168" step="0.5" required></label><label class="check"><input name="advancedIntervals" type="checkbox"><span data-i18n="advancedIntervals">顯示 Claude 的快速監測選項</span></label><p class="hint" data-i18n="claudeWarning">Claude 建議至少每 5 分鐘查詢；更短的間隔可能觸發長時間限流。</p><label class="check"><input name="push" type="checkbox"><span data-i18n="pushEnabled">啟用伺服器事件推播</span></label><button class="primary" type="submit" data-i18n="saveSettings">儲存設定</button></form>
+        <section class="panel"><h3 data-i18n="pushTitle">這台裝置的通知</h3><p class="hint" data-i18n="pushHelp">訂閱低額度、額度恢復與憑證過期通知。需 HTTPS 或 localhost；iOS 請先加入主畫面。</p><p id="push-status" role="status"></p><div class="button-row"><button id="push-subscribe" class="primary" data-i18n="subscribe">啟用通知</button><button id="push-unsubscribe" data-i18n="unsubscribe">解除訂閱</button><button id="push-test" data-i18n="testPush">測試推播</button></div><hr><h3 data-i18n="installTitle">隨時隨地查看</h3><p class="hint" data-i18n="installHelp">從瀏覽器選單安裝應用程式或加入主畫面。離線可開啟介面；即時資料與操作仍需連線。</p><button id="install" hidden data-i18n="install">安裝 Gauge.js</button><hr><p class="hint" data-i18n="serverHelp">服務休眠時監測與推播會暫停。頁面會標示連線與資料的新鮮度。</p></section>
+      </div>
+    </section>
+    <footer><span>Gauge.js</span><span data-i18n="footer">額度查詢與通知，不代理請求。</span></footer>
+  </main>
+  <dialog id="account-dialog"><form id="account-form"><div class="dialog-heading"><h2 id="account-title"></h2><button type="button" data-close="account-dialog" class="icon-button" aria-label="關閉">×</button></div><label><span data-i18n="provider">供應商</span><select name="provider"><option value="antigravity">Antigravity</option><option value="codex">Codex</option><option value="claude">Claude</option><option value="grok">Grok</option></select></label><label><span data-i18n="label">顯示名稱</span><input name="label" maxlength="100" required autocomplete="off"></label><label><span data-i18n="interval">監測間隔</span><select name="interval"></select></label><p id="interval-warning" class="hint"></p><div class="form-row"><label><span data-i18n="lowThreshold">低額度門檻（%）</span><input name="lowPct" type="number" min="0" max="99" step="1" required></label><label><span data-i18n="recoverThreshold">恢復門檻（%）</span><input name="recoverPct" type="number" min="1" max="100" step="1" required></label></div><p class="hint" data-i18n="thresholdHelp">剩餘額度跨越門檻時通知；恢復門檻須大於低額度門檻。</p><div class="button-row end"><button type="button" data-close="account-dialog" data-i18n="cancel">取消</button><button class="primary" type="submit" data-i18n="save">儲存</button></div></form></dialog>
+  <dialog id="login-dialog"><div class="dialog-heading"><h2 data-i18n="loginTitle">連結帳號</h2><button id="cancel-login" class="icon-button" aria-label="關閉">×</button></div><p id="login-account"></p><form id="login-start-form"><label><span data-i18n="loginMode">登入方式</span><select id="login-mode"></select></label><p class="hint" data-i18n="loginSecurity">憑證僅儲存在您的伺服器。請勿在此貼上密碼或存取權杖。</p><button type="submit" class="primary" data-i18n="startLogin">開始登入</button></form><div id="login-flow" hidden><p id="login-instructions"></p><p id="login-code" class="device-code"></p><div class="button-row"><a id="login-link" class="button primary" target="_blank" rel="noopener noreferrer" data-i18n="openAuthorization">開啟授權頁面</a><button id="copy-code" hidden data-i18n="copyCode">複製代碼</button></div><p id="login-expiry" class="hint"></p><form id="login-complete-form" hidden><label><span data-i18n="authorizationInput">授權碼或完整回導網址</span><textarea name="input" rows="3" required autocomplete="off" spellcheck="false"></textarea></label><button type="submit" class="primary" data-i18n="completeLogin">完成登入</button></form><p id="login-state" role="status" aria-live="polite"></p></div></dialog>
+  <dialog id="confirm-dialog"><h2 data-i18n="deleteAccount">刪除帳號</h2><p id="delete-message"></p><p class="hint" data-i18n="deleteHelp">這會刪除此帳號的憑證與歷史資料，無法復原。</p><div class="button-row end"><button data-close="confirm-dialog" data-i18n="cancel">取消</button><button id="confirm-delete" class="danger" data-i18n="delete">刪除</button></div></dialog>
+  <dialog id="pin-dialog"><form id="pin-form"><img class="pin-icon" src="/icons/icon-192.png" width="56" height="56" alt=""><h2 data-i18n="unlockTitle">解鎖儀表板</h2><p class="hint" data-i18n="pinHelp">輸入此伺服器的存取 PIN。PIN 僅儲存於此分頁工作階段。</p><label><span data-i18n="pin">存取 PIN</span><input id="pin" name="pin" type="password" autocomplete="current-password" required></label><p id="pin-error" class="error-text" role="alert"></p><button type="submit" class="primary" data-i18n="unlock">解鎖</button></form></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
