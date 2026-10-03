@@ -56,6 +56,12 @@ Replit 工作區／部署檔案系統**不保證永久或跨部署持久**。自
 
 **Loopback 指的是瀏覽器所在裝置，不是雲端伺服器**。本機 callback 必須在跑服務的電腦瀏覽器完成；手機不能替另一台電腦接收 localhost 回導。雲端不註冊本機 callback，使用設備碼／貼回方式。不要把回導網址貼到 issue、聊天或日誌；授權碼亦屬敏感資料。供應商公開客戶端與非正式額度端點可能改版；錯誤不得用假額度掩蓋。Codex 帳號 ID、Claude 貼回頁行為及各家 refresh 輪替皆需要真實帳號驗證。
 
+### 已連結但無額度：Gemini 與 Grok
+
+- **Gemini / 現有 `antigravity` 帳號**：目前 Google OAuth 仍使用企劃書指定的 Gemini CLI 公開客戶端，並非新版 Antigravity OAuth 整合。[Google 已於 2026-06-18 停止個人／Google AI Pro／Ultra 帳號使用此路徑](https://developers.google.com/gemini-code-assist/docs/deprecations/code-assist-individuals)。實測 OAuth 成功，但 `loadCodeAssist` 回 `UNSUPPORTED_CLIENT`，額度請求回 `403 SUBSCRIPTION_REQUIRED`。介面會顯示 `GOOGLE_CONSUMER_UNSUPPORTED`，重新登入不能解決；需要另外完成新版 Antigravity 整合，不能僅更改名稱或假裝已有額度。受支援的 Code Assist Standard／Enterprise 不應被誤判為消費者停用；查詢會先取得 quota project。
+- **Grok**：實測 OAuth 成功，兩種 billing 格式皆 HTTP 200，但缺少 `creditUsagePercent` 且可用分母為 0，無法得出剩餘百分比。有效週期但未提供用量時顯示 `GROK_QUOTA_UNAVAILABLE`；這不代表憑證失效、不代表沒有訂閱，也不能當成剩餘 100%。[官方 Grok Build billing 實作](https://github.com/xai-org/grok-build/blob/main/crates/codegen/xai-grok-shell/src/extensions/billing.rs)將百分比視為可選；[其他整合的已知限制](https://github.com/steipete/CodexBar/blob/main/docs/grok.md)亦記錄此情況。現有 OAuth REST 路徑無法提供這個帳號的真實額度，請在官方介面查看；未加入瀏覽器 cookies／WKE 讀取或未驗證的替代來源。
+- 診斷修正已通過建置、38 項測試、真實帳號查詢與桌面瀏覽器錯誤顯示驗證；**不是兩家額度已恢復的宣告**。更新後重新載入頁面，讓 PWA 靜態快取切換至新版。
+
 ## 排程與 PWA
 
 每帳號間隔：30 秒、1／2／5／10／15／30 分鐘、1／2／5 小時。預設 Claude／Codex／Antigravity 5 分鐘、Grok 10 分鐘；Claude 短於 5 分鐘選項需進階模式。排程有單飛、±10% 抖動與 429/5xx 指數退避（上限 30 分鐘），每帳號保留最近 200 筆趨勢。預設低額度 20%、恢復 90%、同事件冷卻 6 小時，可調整。

@@ -12,7 +12,7 @@ interface AppWorkerScope {
   clients: { claim(): Promise<void>; matchAll(options: { type: string; includeUncontrolled: boolean }): Promise<AppWindowClient[]>; openWindow(url: string): Promise<unknown> };
 }
 const worker = globalThis as unknown as AppWorkerScope;
-const shellCache = 'gauge-shell-v1';
+const shellCache = 'gauge-shell-v2';
 const shellFiles = ['/', '/index.html', '/styles.css', '/manifest.webmanifest', '/js/app.js', '/js/i18n.js', '/locales/en.json', '/locales/zh-TW.json', '/locales/ja.json', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-192.png', '/icons/maskable-512.png'];
 worker.addEventListener('install', (event: WorkerLifecycleEvent) => {
   event.waitUntil(caches.open(shellCache).then(cache => cache.addAll(shellFiles)).then(() => worker.skipWaiting()));
