@@ -1,0 +1,12 @@
+{
+  "name": "gauge-js", "version": "1.0.0", "private": true, "type": "module",
+  "description": "Self-hosted AI subscription quota dashboard and Web Push PWA",
+  "license": "Apache-2.0", "engines": {"node": ">=22.13.0"},
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.client.json && node --experimental-strip-types scripts/generate-icons.ts",
+    "start": "node dist/src/server.js", "dev": "npm run build && npm start",
+    "test": "npm run build && node --test dist/tests/*.test.js",
+    "backup": "node dist/scripts/backup.js"
+  },
+  "devDependencies": {"typescript": "^5.9.3", "@types/node": "^22.19.0"}
+}
