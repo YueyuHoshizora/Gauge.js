@@ -1,3 +1,4 @@
+import { AppError } from '../types.js';
 import type { Auth, Provider, QuotaResult, QuotaWindow } from '../types.js';
 import { expect, form, iso, json, number, object, refreshToken, request, schema, text, tokens, window } from './common.js';
 // Google's published installed-app credentials, not application-private secrets.
@@ -29,17 +30,29 @@ export function parseAntigravityModels(value: unknown): QuotaWindow[] {
 }
 export const antigravity: Provider = {
   async check(auth: Auth) {
-    const result = parseAntigravityUsage(expect(await request('https://cloudcode-pa.googleapis.com/v1internal:retrieveUserQuota', json({}, auth.accessToken))));
     const metadata = { ideType: 'ANTIGRAVITY', platform: 'PLATFORM_UNSPECIFIED', pluginType: 'GEMINI' };
     let project: string | undefined;
+    let profile: Record<string, unknown> = {};
     try {
-      const profile = expect(await request('https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist', json({ metadata }, auth.accessToken)));
-      const tier = object(profile.paidTier ?? profile.currentTier); const plan = text(tier.name) ?? text(tier.id);
-      if (plan) result.meta.plan = plan;
+      profile = expect(await request('https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist', json({ metadata }, auth.accessToken)));
       project = text(profile.cloudaicompanionProject) ?? text(object(profile.cloudaicompanionProject).id);
-      if (project) result.meta.project = project;
-      const email = text(profile.email) ?? text(auth.extra.email); if (email) result.meta.email = email;
-    } catch { /* Supplementary metadata is best-effort. */ }
+    } catch { /* Quota can still be available when supplementary profile lookup fails. */ }
+    const response = await request('https://cloudcode-pa.googleapis.com/v1internal:retrieveUserQuota', json(project ? { project } : {}, auth.accessToken));
+    const subscriptionRequired = response.status === 403 && Array.isArray(object(response.data.error).details) && (object(response.data.error).details as unknown[]).some(value => {
+      const detail = object(value);
+      return detail.domain === 'cloudaicompanion.googleapis.com' && detail.reason === 'SUBSCRIPTION_REQUIRED';
+    });
+    if (subscriptionRequired) {
+      const unsupported = Array.isArray(profile.ineligibleTiers) && profile.ineligibleTiers.some(value => object(value).reasonCode === 'UNSUPPORTED_CLIENT');
+      const licensed = text(object(profile.paidTier).id) || text(object(profile.paidTier).name) || ['standard-tier', 'enterprise-tier'].includes(text(object(profile.currentTier).id) ?? '');
+      if (unsupported && !licensed) throw new AppError('GOOGLE_CONSUMER_UNSUPPORTED', 'Google no longer supports consumer accounts through this Gemini CLI OAuth client. Use Antigravity or a supported Code Assist subscription.', 400);
+      throw new AppError('GOOGLE_SUBSCRIPTION_REQUIRED', 'Google requires a supported Code Assist subscription and project for this quota endpoint.', 400);
+    }
+    const result = parseAntigravityUsage(expect(response));
+    const tier = object(profile.paidTier ?? profile.currentTier); const plan = text(tier.name) ?? text(tier.id);
+    if (plan) result.meta.plan = plan;
+    if (project) result.meta.project = project;
+    const email = text(profile.email) ?? text(auth.extra.email); if (email) result.meta.email = email;
     try {
       const init = json(project ? { project } : {}, auth.accessToken);
       init.headers = { ...init.headers, 'Client-Metadata': JSON.stringify(metadata) };
