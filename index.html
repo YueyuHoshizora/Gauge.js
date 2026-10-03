@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Gauge.js：自架 AI 訂閱額度監測 PWA，支援 Antigravity、Codex、Claude 與 Grok。">
+  <meta name="color-scheme" content="light dark">
+  <title>Gauge.js — AI 訂閱額度儀表板</title>
+  <style>
+    :root{color-scheme:light dark;font-family:system-ui,sans-serif;background:#f5f7fb;color:#17243a}body{margin:0;line-height:1.7}main{max-width:920px;margin:auto;padding:64px 24px}h1{font-size:clamp(2.8rem,8vw,5rem);line-height:1.1;margin:0}h2{line-height:1.3}p{max-width:72ch}a{color:#2350b4;text-underline-offset:3px}.lead{font-size:1.25rem}.badge{font-size:.85rem;font-weight:700;letter-spacing:.12em}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin:32px 0}.card{padding:22px;border:1px solid #cad2e2;border-radius:16px;background:#fff}.card h2{margin-top:0;font-size:1.15rem}.links{display:flex;flex-wrap:wrap;gap:18px;margin:24px 0}.notice{border-left:4px solid #2350b4;padding:12px 18px;background:#e9effb}code{font-size:.9em}footer{margin-top:48px;border-top:1px solid #cad2e2;padding-top:20px;font-size:.9rem}@media(prefers-color-scheme:dark){:root{background:#111722;color:#e8edf6}.card{background:#192232;border-color:#43506a}a{color:#9ebeff}.notice{background:#1b2b49;border-color:#9ebeff}footer{border-color:#43506a}}
+  </style>
+</head>
+<body>
+<main>
+  <p class="badge">SELF-HOSTED · TYPESCRIPT · PWA</p>
+  <h1>Gauge.js</h1>
+  <p class="lead">你的 AI 訂閱額度，一眼掌握。</p>
+  <p>自架多帳號訂閱額度儀表板，整合 Antigravity、Codex、Claude 與 Grok，定期查詢剩餘額度與重設時間，透過 Web Push 通知額度偏低、恢復與憑證過期。</p>
+  <nav class="links" aria-label="專案連結">
+    <a href="https://github.com/YueyuHoshizora/Gauge.js">GitHub 原始碼</a>
+    <a href="https://github.com/YueyuHoshizora/Gauge.js/blob/main/README.md">安裝與部署</a>
+    <a href="https://github.com/YueyuHoshizora/Gauge.js/blob/main/SECURITY.md">安全政策</a>
+    <a href="https://github.com/YueyuHoshizora/Gauge.js/blob/main/PLAN.md">完整企劃書</a>
+  </nav>
+  <p class="notice"><strong>這裡是專案介紹，不是儀表板。</strong>GitHub Pages 不執行 Node.js、保存訂閱憑證或提供 API。請自行在本機或 HTTPS 雲端部署，於該服務網址使用儀表板；本頁不要求輸入 PIN 或登入供應商。</p>
+  <section class="grid" aria-label="功能介紹">
+    <article class="card"><h2>四家、多個帳號</h2><p>從網頁開始 OAuth 登入，不讀取本機 CLI 憑證。依帳號設定監測間隔與提醒門檻。</p></article>
+    <article class="card"><h2>可安裝的 PWA</h2><p>離線開啟介面外殼、查看趨勢與重設倒數。推播需要 HTTPS、裝置支援及通知授權。</p></article>
+    <article class="card"><h2>十主題、三語系</h2><p>白到黑十款主題，跟隨系統或手動選擇；繁體中文、English、日本語，記住你的偏好。</p></article>
+    <article class="card"><h2>資料由你管理</h2><p>Node.js ≥22.13、原生 SQLite 與零執行期第三方套件。雲端必須有 PIN 與 HTTPS origin；資料與備份需妥善保護。</p></article>
+  </section>
+  <section><h2>開始使用</h2><p>取得原始碼後，使用支援版本的 Node.js 執行 <code>npm install</code>、<code>npm run build</code>、<code>npm start</code>，再開啟 <code>http://localhost:8787</code>。Replit 與其他雲端請先依 README 配置 Secrets、HTTPS、持久磁碟和備份。</p><p>平台休眠期間不會監測；離線外殼不代表資料是最新。供應商內部端點可能改版，真實登入、刷新與裝置推播必須在你的部署上完成驗證。</p></section>
+  <section><h2>驗證狀態</h2><p>本介紹頁不宣稱測試已通過、服務已部署或手動 Gate 已完成。四家真實帳號、兩輪 token 刷新、Replit 登入、推播交付、24 小時運作、無障礙与備份還原等驗收要求列於企劃書。</p></section>
+  <footer>Gauge.js · Apache-2.0 · <a href="https://github.com/YueyuHoshizora/Gauge.js/blob/main/LICENSE">LICENSE</a></footer>
+</main>
+</body>
+</html>

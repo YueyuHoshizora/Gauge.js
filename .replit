@@ -1,0 +1,15 @@
+run = "npm start"
+build = "npm install && npm run build"
+entrypoint = "dist/src/server.js"
+
+[deployment]
+build = ["sh", "-c", "npm install && npm run build"]
+run = ["sh", "-c", "npm start"]
+
+[env]
+GAUGE_CLOUD = "1"
+HOST = "0.0.0.0"
+
+# Select Node >=22.13 in the platform runtime configuration.
+# Configure GAUGE_PIN, GAUGE_ORIGIN and VAPID_SUBJECT using Replit Secrets.
+# The platform supplies PORT; no PIN or fixed public origin belongs here.
